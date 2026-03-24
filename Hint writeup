@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Write-up — Stéganographie (Dr. Zeno)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #22c55e;
+      --accent-2: #60a5fa;
+      --code-bg: #0b1020;
+      --border: #1f2937;
+    }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }
+    .container { max-width: 980px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+    h1, h2, h3 { line-height: 1.2; margin: 1.5rem 0 .75rem; }
+    h1 { font-size: 1.9rem; }
+    h2 { font-size: 1.4rem; color: var(--accent-2); }
+    h3 { font-size: 1.15rem; color: var(--accent); }
+    p { margin: .6rem 0; }
+    ul, ol { margin: .3rem 0 .9rem 1.2rem; }
+    code, kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: .95em; }
+    pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: .85rem 1rem; overflow: auto; }
+    pre code { color: #e2e8f0; }
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+    .muted { color: var(--muted); }
+    .flag { font-weight: 700; color: #fef3c7; background: #7c3aed33; border: 1px solid #7c3aed66; padding: .6rem .8rem; border-radius: 8px; display: inline-block; }
+    .kbd { background: #111827; border: 1px solid var(--border); border-bottom-width: 3px; padding: .15rem .4rem; border-radius: 6px; }
+    .toc a { color: var(--accent-2); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    hr { border: 0; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+    .badge { display: inline-block; font-size: .78rem; padding: .2rem .5rem; border-radius: 999px; border: 1px solid var(--border); background: #0b1020; color: var(--muted); margin-right: .4rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Dumpster diving, wordlists et stéganographie (steghide/stegseek)</h1>
+      <p class="muted">Write-up complet et reproductible pour extraire un flag caché dans une image JPEG protégée par mot de passe.</p>
+      <div>
+        <span class="badge">Catégorie: Stéganographie</span>
+        <span class="badge">Difficulté: Intermédiaire</span>
+        <span class="badge">Outils: file · exiftool · steghide · stegseek · crunch</span>
+      </div>
+    </header>
+
+    <section class="panel toc">
+      <h2>Table des matières</h2>
+      <ol>
+        <li><a href="#informations-generales">Informations générales</a></li>
+        <li><a href="#outils">Outils utilisés</a></li>
+        <li><a href="#resume">Résumé de l’approche</a></li>
+        <li><a href="#etapes-detaillees">Étapes détaillées</a></li>
+        <li><a href="#pourquoi-ca-marche">Pourquoi cette méthode fonctionne</a></li>
+        <li><a href="#bonnes-pratiques">Bonnes pratiques et pièges</a></li>
+        <li><a href="#cheat-sheet">Reproduction rapide (cheat-sheet)</a></li>
+        <li><a href="#flag">Flag</a></li>
+      </ol>
+    </section>
+
+    <section id="informations-generales">
+      <h2>Informations générales</h2>
+      <ul>
+        <li><strong>Objectif:</strong> Extraire un flag caché dans une image JPEG protégée par mot de passe.</li>
+        <li><strong>Indice:</strong> Les mots de passe du Dr. Zeno font entre 6 et 7 caractères et utilisent cet alphabet: <code>ezdot-g.4#$18_593</code>.</li>
+      </ul>
+    </section>
+
+    <section id="outils">
+      <h2>Outils utilisés</h2>
+      <ul>
+        <li><code>file</code>: Identifier le type réel du fichier</li>
+        <li><code>exiftool</code>: Inspecter les métadonnées</li>
+        <li><code>steghide</code>: Insertion/extraction stéganographique</li>
+        <li><code>stegseek</code>: Attaque par dictionnaire optimisée pour steghide</li>
+        <li><code>crunch</code>: Générer une wordlist personnalisée</li>
+      </ul>
+    </section>
+
+    <section id="resume">
+      <h2>Résumé de l’approche</h2>
+      <ol>
+        <li>Décompresser l’archive ZIP pour récupérer l’image.</li>
+        <li>Vérifier le type de fichier et la présence de données cachées.</li>
+        <li>Générer une wordlist avec <em>crunch</em> (longueur 6–7, alphabet restreint).</li>
+        <li>Lancer une attaque dictionnaire avec <em>stegseek</em>.</li>
+        <li>Lire le fichier extrait pour récupérer le flag.</li>
+      </ol>
+    </section>
+
+    <section id="etapes-detaillees">
+      <h2>Étapes détaillées</h2>
+
+      <h3>1) Extraction de l’archive</h3>
+      <pre><code class="language-bash">unzip "Dr. Zeno.zip"
+ls -la</code></pre>
+      <p>Vérifier que l’image <code>Dr. Zeno.jpg</code> est bien présente.</p>
+
+      <h3>2) Vérifications et détection de stéganographie</h3>
+      <p>Confirmer qu’il s’agit bien d’un JPEG valide et sonder la présence de données cachées.</p>
+      <pre><code class="language-bash">file "Dr. Zeno.jpg"
+exiftool "Dr. Zeno.jpg"
+steghide info "Dr. Zeno.jpg"</code></pre>
+      <p><em>Résultat attendu</em>:
+        <ul>
+          <li><code>file</code> → « JPEG image data ».</li>
+          <li><code>exiftool</code> → métadonnées standard.</li>
+          <li><code>steghide info</code> → données cachées détectées, protégées par mot de passe.</li>
+        </ul>
+      </p>
+
+      <h3>3) Génération de la wordlist (<code>crunch</code>)</h3>
+      <p>Alphabet: <code>ezdot-g.4#$18_593</code> — Longueur: 6 à 7.</p>
+      <p class="muted">Astuce: entourez l’alphabet avec des quotes pour éviter l’interprétation de <kbd class="kbd">$</kbd> et <kbd class="kbd">#</kbd> par le shell.</p>
+      <pre><code class="language-bash">crunch 6 7 'ezdot-g.4#$18_593' -o zeno.txt</code></pre>
+      <p class="muted">Espace de recherche théorique ≈ 17⁶ + 17⁷ ≈ 4,34×10⁸ combinaisons; reste abordable avec <code>stegseek</code>.</p>
+
+      <h3>4) Attaque dictionnaire (<code>stegseek</code>)</h3>
+      <pre><code class="language-bash">stegseek "Dr. Zeno.jpg" zeno.txt</code></pre>
+      <p><em>Résultat attendu</em>:
+        <ul>
+          <li>Affichage « Password found » et extraction automatique dans <code>Dr. Zeno.jpg.out</code>.</li>
+        </ul>
+      </p>
+      <p class="muted">Alternative: une fois le mot de passe trouvé, on peut aussi utiliser <code>steghide extract -sf "Dr. Zeno.jpg" -p "LE_MOT_DE_PASSE"</code>.</p>
+
+      <h3>5) Lecture du flag</h3>
+      <pre><code class="language-bash">cat "Dr. Zeno.jpg.out"</code></pre>
+    </section>
+
+    <section id="pourquoi-ca-marche">
+      <h2>Pourquoi cette méthode fonctionne</h2>
+      <ul>
+        <li><strong>Indice exploité:</strong> mot de passe court et alphabet restreint → réduction drastique de l’espace de recherche.</li>
+        <li><strong>Outils adaptés:</strong> <code>crunch</code> génère la wordlist ciblée; <code>stegseek</code> accélère la recherche pour steghide.</li>
+        <li><strong>Workflow simple:</strong> vérif → génération → attaque → extraction → lecture.</li>
+      </ul>
+    </section>
+
+    <section id="bonnes-pratiques">
+      <h2>Bonnes pratiques et pièges à éviter</h2>
+      <ul>
+        <li>Toujours <strong>quoter</strong> l’alphabet dans <code>crunch</code> pour éviter l’expansion de <kbd class="kbd">$</kbd> et l’interprétation de <kbd class="kbd">#</kbd>.</li>
+        <li>Vérifier le <strong>type réel</strong> du fichier avec <code>file</code> (éviter les leurres d’extension).</li>
+        <li>Sur grosses wordlists, prévoir de la place disque/temps CPU et, si besoin, <code>split</code> la liste.</li>
+        <li>Commencer par la <strong>longueur 6</strong> seule si le temps est serré, puis passer à 7.</li>
+        <li>Utiliser un <strong>SSD</strong> pour de meilleures performances d’E/S.</li>
+      </ul>
+    </section>
+
+    <section id="cheat-sheet" class="panel">
+      <h2>Reproduction rapide (cheat-sheet)</h2>
+      <pre><code class="language-bash">unzip "Dr. Zeno.zip"
+file "Dr. Zeno.jpg"
+steghide info "Dr. Zeno.jpg"
+crunch 6 7 'ezdot-g.4#$18_593' -o zeno.txt
+stegseek "Dr. Zeno.jpg" zeno.txt
+cat "Dr. Zeno.jpg.out"</code></pre>
+    </section>
+
+    <section id="flag">
+      <h2>Flag</h2>
+      <p class="flag">IPNET{dUmps7_________ _ _ _ _ _ _ _  _$$D}</p>
+    </section>
+
+    <hr />
+
+    <footer class="muted">
+      <p>Ce write-up est fourni à titre pédagogique. Utilisez ces techniques uniquement dans des contextes légaux et autorisés (CTF, lab, pentest avec accord explicite).</p>
+    </footer>
+  </div>
+</body>
+</html>
