@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Contactez-moi</title>
+    <link rel="stylesheet" href="formulaire.css">
+</head>
+<body>
+
+    <!-- Menu de navigation -->
+    <nav>
+        <ul>
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="contact.html">Contactez-moi</a></li>
+        </ul>
+    </nav>
+
+    <h1>Contactez-moi</h1>
+
+    <form>
+        <!-- Nom complet -->
+        <label for="nom">Nom complet</label>
+        <input type="text" id="nom" name="nom" required>
+
+        <!-- Email -->
+        <label for="email">Adresse e-mail</label>
+        <input type="email" id="email" name="email" required>
+
+        <!-- Mot de passe -->
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password" required>
+
+        <!-- Sujet -->
+        <label for="sujet">Sujet</label>
+        <select id="sujet" name="sujet">
+            <option>Information</option>
+            <option>Inscription</option>
+            <option>Assistance</option>
+        </select>
+
+        <!-- Boutons radio -->
+        <label>Type de contact</label>
+        <div class="options">
+            <input type="radio" id="etudiant" name="type" value="etudiant">
+            <label for="etudiant">Étudiant</label>
+
+            <input type="radio" id="professionnel" name="type" value="professionnel">
+            <label for="professionnel">Professionnel</label>
+        </div>
+
+        <!-- Case à cocher -->
+        <div class="options">
+            <input type="checkbox" id="newsletter">
+            <label for="newsletter">S’inscrire à la newsletter</label>
+        </div>
+
+        <!-- Message -->
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="4"></textarea>
+
+        <!-- Bouton -->
+        <button type="submit">Envoyer</button>
+    </form>
+
+</body>
+</html>

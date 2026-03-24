@@ -1,0 +1,54 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 30px;
+}
+
+/* Menu */
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 30px;
+    display: flex;
+    gap: 20px;
+}
+
+nav a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #000;
+}
+
+/* Titres */
+h1 {
+    margin-bottom: 20px;
+}
+
+/* Formulaire */
+form {
+    max-width: 400px;
+}
+
+/* Organisation verticale */
+label {
+    display: block;
+    margin-top: 15px;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+}
+
+/* Options radio / checkbox */
+.options {
+    margin-top: 10px;
+}
+
+/* Bouton */
+button {
+    margin-top: 20px;
+    padding: 10px;
+    width: 100%;
+    font-weight: bold;
+}

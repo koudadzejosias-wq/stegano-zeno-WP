@@ -1,0 +1,27 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+/* Tableau */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Bordures et cellules */
+th, td {
+    border: 1px solid #000;
+    padding: 10px;
+    text-align: center;
+}
+
+/* En-tête */
+th {
+    font-weight: bold;
+}
+
+/* Première colonne */
+td:first-child {
+    font-weight: bold;
+}
