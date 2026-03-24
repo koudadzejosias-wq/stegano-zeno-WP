@@ -68,7 +68,7 @@ a:hover {
 }
  a:active /* Quand le visiteur clique sur le lien */
  {
-      background-color : # yellow ;
+      background-color: yellow;
  }
  a:focus /* Quand le visiteur clique sur le lien */
  {
