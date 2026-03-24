@@ -1,0 +1,65 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #e8f4ff;
+    color: #000;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Navigation */
+.nav {
+    margin-bottom: 20px;
+}
+
+.nav a {
+    color: darkblue;
+    text-decoration: none;
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+.nav a:hover {
+    color: green;
+    text-decoration: underline;
+}
+
+/* Titre */
+h1 {
+    color: darkblue;
+    border-bottom: 3px solid black;
+    padding-bottom: 5px;
+}
+
+/* Zone profil */
+.profile-box {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.profile-box img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 2px solid #003366;
+    object-fit: cover;
+}
+
+.profile-box figcaption {
+    font-style: italic;
+    color: #555;
+    margin-top: 8px;
+}
+
+.profile-box p {
+    color: #888;
+    font-size: 0.9em;
+}
+
+/* Paragraphe */
+p {
+    border: 2px solid black;
+    padding: 12px;
+    border-radius: 12px;
+    background-color: white;
+    box-shadow: 4px 4px 0px black;
+}
